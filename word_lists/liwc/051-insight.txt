@@ -1,0 +1,155 @@
+accept motiv*
+accepta* notice
+accepted noticed
+accepting notices
+accepts noticing
+acknowledg* perceiv*
+admit percept*
+admits perspective
+admitted persua*
+admitting ponder*
+afterthought* prefer*
+analy* presum*
+answer* pretend*
+appreciat* prove*
+assum* proving
+attent* quer*
+aware* question
+became questioned
+become questioning
+becomes questions
+becoming rational*
+belief* realization*
+believe realize
+believed realized
+believes realizes
+believing realizing
+categor* rearrang*
+choice* reason*
+choos* rebel*
+clarif* recall*
+closure recogni*
+clue recollect*
+cohere* reconcil*
+complex reconsider*
+complexity reconstruct*
+complicate reevaluat*
+complicated refer*
+complicates reflect*
+complicating relate*
+complication* relating
+compreh* relation
+concentrat* relations
+conclud* remember
+conclus* remembered
+confess* remembering
+conscious* remembers
+consider reorgani*
+consideration resolu*
+considered resolv*
+considering restructur*
+considers rethink*
+contemplat* reveal*
+convinc* revelat*
+correlat* secret
+curio* secretive
+decide secretively
+decided secrets
+decides seem
+deciding seemed
+decis* seeming*
+deduc* seems
+define sense
+defines sensed
+defining senses
+definition sensing
+determina* skeptic*
+determine solution*
+determined solve
+determines solved
+determining solves
+diagnos* solving
+discern* sought
+disclo* statement*
+discover* suspect*
+disillusion* suspicio*
+distract* think
+effect* thinker*
+enlighten* thinking
+evaluat* thinks
+evidence thought
+examin* thoughts
+explain trick
+explained tricked
+explaining trickier
+explains trickiest
+explanat* tricks
+explor* tricky
+eel unaccept*
+eeling unaware*
+eelings understand
+eels understandab*
+elt understanding*
+igur* understands
+ind understood
+inding unrelat*
+indings wisdom
+inds wise
+orgave wisely
+orgiv* wiser
+ound wisest
+genuine wonder
+genuinely wondered
+grasp* wondering
+heed wonders
+heeded
+dea
+deas
+dentif*
+magin*
+nduc*
+nfer
+nferen*
+nferr*
+nfers
+nfo
+nform
+nformation
+nformative*
+nformed
+nforming
+nforms
+nquir*
+nsight*
+nspir*
+nterpret*
+ustif*
+knew
+know
+knowab*
+knowing
+knowledg*
+known
+knows
+earn
+earned
+earner
+earners
+earning
+earns
+earnt
+esson*
+ink*
+ogic*
+mean
+meaning*
+means
+meant
+memorabl*
+memories
+memoris*
+memoriz*
+memory
+methinks
+mindful*
+misunder*
