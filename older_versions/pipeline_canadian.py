@@ -157,7 +157,6 @@ class Pipeline(object):
         all_fpaths.sort()
         return all_fpaths
 
-
     def get_contract_ids(self, include_lang=False):
         """
         Returns a list of the contract_ids for each contract in the corpus
@@ -1268,7 +1267,7 @@ class Pipeline(object):
 ### MAIN FUNCTION (FOR TESTING) ###
 ###################################
 
-# canadian.conf
+# canadian_dominik.conf
 
 # benjamins_data
 # benjamins_data.conf

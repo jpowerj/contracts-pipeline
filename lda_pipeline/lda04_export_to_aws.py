@@ -39,7 +39,7 @@ def export_to_aws(pl, custom_glob=None, instances=None):
         # Do the exporting directly through python
         fpath_list = []
         # Standard set of files
-        fpath_list.append(os.path.join("configs","canadian.conf"))
+        fpath_list.append(os.path.join("configs","canadian_dominik.conf"))
         lda_fpath_list = glob.glob(os.path.join("lda_pipeline","lda*"))
         fpath_list.extend(lda_fpath_list)
         fpath_list.append("pipeline.py")
@@ -72,7 +72,7 @@ def export_to_aws(pl, custom_glob=None, instances=None):
 #     filepath_list = []
 #     if not custom_glob:
 #         # Standard set of files
-#         filepath_list.append("configs/canadian.conf")
+#         filepath_list.append("configs/canadian_dominik.conf")
 #         lda_filepath_list = glob.glob("lda_pipeline/lda*")
 #         filepath_list.extend(lda_filepath_list)
 #         filepath_list.append("pipeline.py")
