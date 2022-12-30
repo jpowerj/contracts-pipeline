@@ -9,6 +9,7 @@ import plutil
 
 # 3rd party imports
 import boto3
+import gensim
 import numpy as np
 import spacy
 import unidecode
@@ -16,8 +17,9 @@ import unidecode
 
 class Pipeline:
     def __init__(self, corpus_name, config_fname=None, mode="plaintext", mode_options=None,
-                 output_dirname=None, output_path=None, lang_list=None,
+                 output_dirname=None, batch_mode="contract", lang_list=None,
                  sample_N=None, random_seed=1948, splitter="regex",
+                 use_aws=False, num_lda_chunks=-1, num_lda_topics=20,
                  verbose=False):
         """
         Object containing data needed throughout the pipeline.
@@ -91,10 +93,42 @@ class Pipeline:
             self.txt_fnames = sample_fnames
             # And update the corpus name
             self.corpus_name = self.corpus_name + "_s" + str(self.sample_N)
+        self.batch_mode = batch_mode
         # We don't initialize the spaCy model here (only as needed)
         self.spacy_model = None
         # But we do load the config file
         self.subnorm_dict = self.load_subnorm_dict()
+        # And this allows us to construct a static stopword list
+        self.stopwords = self.gen_stopword_list()
+        self.use_aws = use_aws
+        self.num_lda_chunks = num_lda_chunks
+        self.num_lda_topics = num_lda_topics
+
+    def gen_stopword_list(self):
+        """
+        This used to be in plutil.py, but moved here since it is
+        actually run-specific (since the subjectnorm keys are themselves used
+        as stopwords). The final list of stopwords is the union of NLTK
+        stopwords, stopwords from lextek, and list of subjects
+        """
+        from nltk.corpus import stopwords
+        nltk_stoplist = set(stopwords.words('english'))
+        #if print_stopwords:
+        #    print("NLTK stoplist: " + str(sorted(list(nltk_stoplist))))
+        # Load the Lextek stopword list, if a path was given in the .conf file
+        lextek_stoplist = set()
+        if "LEXTEK_FPATH" in self.path_config:
+            lextek_rel_fpath = self.path_config["LEXTEK_FPATH"]
+            lextek_fpath = os.path.join(self.contracts_root, lextek_rel_fpath)
+            lextek_stoplist = set(plutil.stopwords_from_file(lextek_fpath))
+        #if print_stopwords:
+        #    print("Lextek stoplist: " + str(sorted(list(lextek_stoplist))))
+        subject_list = set(self.get_subnorm_list())
+        #if print_stopwords:
+        #    print("Filtered subjects: " + str(sorted(list(subject_list))))
+        # Take the union of all the above lists for our final stopword list
+        word_set = nltk_stoplist.union(lextek_stoplist).union(subject_list)
+        return list(word_set)
 
     def get_artsplit_output_path(self, ext):
         return os.path.join(self.get_output_path(), f"01_artsplit_elliott_{ext}")
@@ -108,6 +142,39 @@ class Pipeline:
     def get_corpus_name(self):
         return self.corpus_name
 
+    def get_instance_num(self):
+        """
+        If running on AWS, this returns the environment var we set which tells
+        us which instance this is (from 1 to N)
+        :return:
+        """
+        if not self.use_aws:
+            return -1
+        return os.getenv("INSTANCE_NUM")
+
+    def get_lda_corpus_fpath(self):
+        return os.path.join(self.get_output_path(), f"lda06_gensim_corpus.pkl")
+
+    def get_lda_dict_fpath(self):
+        return os.path.join(self.get_output_path(), f"lda02a_gensim_dict.pkl")
+
+    def get_lda_doclist_fpath(self, chunk_num=-1):
+        """
+        If lda_batch_mode is "chunks", this requires passing in the chunk_num
+        for the fpath. Otherwise, a value of -1 means just an fpath without a
+        suffix
+
+        :return:
+        """
+        chunk_suffix = f"_{chunk_num}" if chunk_num > -1 else ""
+        return os.path.join(self.get_output_path(), f"lda03_doclist{chunk_suffix}.pkl")
+
+    def get_lda_model_fpath(self):
+        return os.path.join(self.get_output_path(), f"lda08_gensim_model.pkl")
+
+    def get_lda_output_fpath(self):
+        return os.path.join(self.get_output_path(), f"lda09_topic_list.txt")
+
     def get_liwc_path(self):
         return os.path.join(self.contracts_root, self.path_config["LIWC_PATH"])
 
@@ -120,6 +187,14 @@ class Pipeline:
     def get_num_docs(self):
         return len(self.txt_fnames)
 
+    def get_num_lda_chunks(self):
+        if not self.use_aws:
+            return -1
+        return self.num_lda_chunks
+
+    def get_obranch_fpath(self, ext):
+        return os.path.join(self.get_output_path(), f"lda01_obranch.{ext}")
+
     def get_output_path(self):
         """
 
@@ -130,6 +205,15 @@ class Pipeline:
 
     def get_pdata_output_path(self):
         return os.path.join(self.get_output_path(), "03b_pdata_pkl")
+
+    def get_preprocessed_fpath(self):
+        """
+        :return: The fpath for the preprocessed object branch documents
+        """
+        return os.path.join(self.get_output_path(), "lda02b_obranch_preprocessed.pkl")
+
+    def get_preprocessed_df_fpath(self):
+        return os.path.join(self.get_output_path(), "lda02c_preprocessed_df.pkl")
 
     def _get_pt_fnames_lang(self, lang):
         """ Get plaintext fnames for a specific language """
@@ -274,6 +358,19 @@ class Pipeline:
     def parse_articles(self):
         import main02_parse_articles
         main02_parse_articles.parse_articles(self)
+
+    def preprocess_text(self, contract_str):
+        """
+        Uses gen_stopwords() and gensim's preprocess_string() method to perform
+        the full preprocessing pipeline on contract_str.
+
+        Added 2019-03-07 by JJ
+        """
+        # First we should remove our custom stopwords
+        filtered_str = " ".join(w for w in contract_str.split() if w not in self.stopwords)
+        # Now use gensim's parsing library
+        final_doc = gensim.parsing.preprocess_string(filtered_str)
+        return final_doc
 
     def split_contracts(self):
         # Import the contract splitting code

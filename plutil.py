@@ -6,10 +6,12 @@ import os
 import boto3
 import inflect
 import joblib
+import multiprocessing
 import pandas as pd
 from tqdm import tqdm
 
 inflecter = inflect.engine()
+
 
 class ArtMeta:
     """
@@ -61,6 +63,14 @@ def gen_timestamp_str():
     """
     return str(datetime.date.today()).replace("-", "")
 
+
+def get_num_workers():
+    """
+    Just uses multiprocessing to get the number of cores - 1
+    :return:
+    """
+    num_workers = multiprocessing.cpu_count() - 1
+    return num_workers
 
 def get_s3_bucket(bucket_name):
     """
@@ -125,7 +135,7 @@ def list_to_regex(word_list):
     return reg_str
 
 
-def _make_dirs(fpath):
+def make_dirs(fpath):
     """
     Helper function that ensures the directories exist, to avoid Exceptions
 
@@ -192,6 +202,7 @@ def get_singular(noun):
 def safe_load_csv(csv_fpath):
     return pd.read_csv(csv_fpath)
 
+
 def safe_load_pickle(pkl_fpath):
     """
     Loads from `pkl_fpath` using the same method as `safe_to_pickle()`.
@@ -203,7 +214,7 @@ def safe_load_pickle(pkl_fpath):
 
 
 def safe_to_csv(df, csv_fpath, **kwargs):
-    _make_dirs(csv_fpath)
+    make_dirs(csv_fpath)
     df.to_csv(csv_fpath, **kwargs)
 
 
@@ -215,16 +226,21 @@ def safe_to_pickle(data, pkl_fpath):
     :param pkl_fpath:
     :return: None
     """
-    _make_dirs(pkl_fpath)
+    make_dirs(pkl_fpath)
     # Now we should be able to save it without error (even if
     # the directory/directories didn't exist before)
     joblib.dump(data, pkl_fpath)
 
 
 def safe_to_stata(df, stata_fpath):
-    _make_dirs(stata_fpath)
+    make_dirs(stata_fpath)
     df.to_stata(stata_fpath)
 
+
+def safe_write_to_file(text, fpath):
+    make_dirs(fpath)
+    with open(fpath, "w", encoding='utf-8') as outfile:
+        outfile.write(text)
 
 def stopwords_from_file(fpath):
     """

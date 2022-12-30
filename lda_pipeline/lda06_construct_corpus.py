@@ -78,7 +78,8 @@ def load_doclist_df(pl, doclist_num):
     serialized_fpath = pl.get_lda_doclist_fpath(doclist_num=doclist_num)
     doc_df = pd.read_pickle(serialized_fpath)
     return doc_df
-  
+
+
 def save_static_corpus(pl, subcorpus, subcorp_num):
     # Save the *actual* subcorpora (i.e., we're done with the doclists now)
     # Using current directory since this will be run on AWS
